@@ -12,4 +12,9 @@ interface IColumn {
     title: string;
 }
 
-export type { ITask, IColumn };
+interface ISelectedTask {
+    activity: string; // 'create' | 'update'
+    task?: ITask;
+}
+
+export type { ITask, IColumn, ISelectedTask };

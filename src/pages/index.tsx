@@ -10,6 +10,10 @@ const App = () => {
   // Inisialisasi tasks dengan INITIAL_TASKS
   const [tasks, setTasks] = useState<ITask[]>(INITIAL_TASKS);
   const [showModalAddTask, setShowModalTask] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<{
+    activity: string;
+    task?: ITask;
+  } | null>(null);
 
   // Load tasks from localStorage
   useEffect(() => {
@@ -56,6 +60,24 @@ const App = () => {
     setShowModalTask(false);
   };
 
+  const handleUpdateTask = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const updatedTask: ITask = {
+      id: selectedTask?.task?.id || Math.random().toString(36).substring(2, 15),
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+      status: selectedTask?.task?.status as ITask['status'],
+    };
+
+    setTasks((prevTasks) => 
+      prevTasks.map((tasks) => tasks.id === updatedTask.id ? 
+      updatedTask : tasks));
+
+    event.currentTarget.reset();
+    setSelectedTask(null);
+  };
+
   return (
     <main className="min-h-screen p-4 flex flex-col">
       <div className="mb-8 flex items-center justify-between">
@@ -71,12 +93,16 @@ const App = () => {
               key={column.id}
               column={column}
               tasks={tasks.filter(task => task.status === column.id)}
+              setSelectedTask={setSelectedTask}
             />
           ))}
         </DndContext>
       </div>
       {showModalAddTask && (
         <ModalTask onCancel={() => setShowModalTask(false)} onSubmit={handleCreateTask} />
+      )}
+      { selectedTask?.activity == 'update' && (
+        <ModalTask onSubmit={handleUpdateTask} onCancel={() => setSelectedTask(null)} selectedTask={selectedTask.task} type="Update" />
       )}
     </main>
   );
