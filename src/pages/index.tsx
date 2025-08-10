@@ -1,5 +1,6 @@
 import Button from "@/components/Button";
 import Column from "@/components/Column";
+import ModalConfirm from "@/components/ModalConfirm";
 import ModalTask from "@/components/ModalTask";
 import { COLUMNS, INITIAL_TASKS } from "@/constants/Task.constants";
 import { ITask } from "@/types/Task";
@@ -78,6 +79,13 @@ const App = () => {
     setSelectedTask(null);
   };
 
+  const handleDeleteTask = () => {
+    setTasks((prevTasks) =>
+      prevTasks.filter((task) => task.id !== selectedTask?.task?.id)
+    );
+    setSelectedTask(null);
+  };
+
   return (
     <main className="min-h-screen p-4 flex flex-col">
       <div className="mb-8 flex items-center justify-between">
@@ -103,6 +111,9 @@ const App = () => {
       )}
       { selectedTask?.activity == 'update' && (
         <ModalTask onSubmit={handleUpdateTask} onCancel={() => setSelectedTask(null)} selectedTask={selectedTask.task} type="Update" />
+      )}
+      { selectedTask?.activity == 'delete' && (
+        <ModalConfirm onConfirm={handleDeleteTask} onCancel={() => setSelectedTask(null)} message={`Are you sure you want to delete the task "${selectedTask.task?.title}"?`} title="Delete Task" type="Delete" />
       )}
     </main>
   );
